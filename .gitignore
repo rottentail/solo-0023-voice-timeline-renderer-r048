@@ -3,3 +3,6 @@
 .DS_Store
 .env
 *.tmp
+
+# Cross-architecture verification working/output directory (generated artifacts)
+/.xarch-results/

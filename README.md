@@ -193,6 +193,28 @@ Each check creates an isolated temporary data directory, starts the real HTTP
 handler, sends generated WAV inputs, and verifies read-back or rendered output.
 The checks are bounded and do not require network access.
 
+## Cross-architecture compatibility
+
+The single-machine workflow checks cannot prove that `amd64` and `arm64`
+deliver compatible audio, because the renderer is floating-point and emits
+integer PCM16. A dedicated, repeatable cross-architecture verification renders
+the same digest-pinned fixtures and timelines through independently compiled
+`arm64` and `amd64` service binaries and judges the downloads with a
+production-independent comparator:
+
+```bash
+scripts/xarch-verify.sh
+```
+
+It accepts only one-PCM16-LSB numeric differences away from digital silence,
+and hard-fails structural, editing, silence, polarity, or larger numeric
+changes, receipt inconsistencies, and digest mismatches. Failures are packaged
+as self-contained, replayable cases under `.xarch-results/failure-case/`. If
+only one architecture can execute, the run is marked inconclusive and the other
+architecture is recorded as unverified rather than treated as passing. See
+[`docs/xarch-verification.md`](docs/xarch-verification.md) for the design and
+the tiered comparison rules.
+
 ## Deferred test boundary
 
 This baseline contains no unit tests, test fixtures, browser checks, or
